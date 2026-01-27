@@ -41,6 +41,7 @@ N_counts = counts.sum()
 mean = np.sum(counts * time) / N_counts
 std = np.sqrt(np.sum(counts * (time - mean) ** 2) / N_counts)
 mean_err = std / np.sqrt(N_counts)
+# Values in ns
 mean_ns = mean * 1e9
 mean_err_ns = mean_err * 1e9
 
