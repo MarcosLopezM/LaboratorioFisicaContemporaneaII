@@ -35,15 +35,19 @@ df = pd.read_csv(
 time = df["Time"].to_numpy()
 counts = df["Ampl"].to_numpy()
 
-errors = np.sqrt(counts)
-errors[errors == 0.0] = 1
 N_counts = counts.sum()
-mean = np.sum(counts * time) / N_counts
-std = np.sqrt(np.sum(counts * (time - mean) ** 2) / N_counts)
+mean = np.sum(counts * time) / N_counts  # Tiempo promedio
+variance = np.sum(counts * (time - mean) ** 2) / (N_counts - 1)
+std = np.sqrt(variance)
 mean_err = std / np.sqrt(N_counts)
-# Values in ns
+
+# Time in ns
 mean_ns = mean * 1e9
 mean_err_ns = mean_err * 1e9
+
+## Barras de error
+errors = np.sqrt(counts)
+errors[errors == 0.0] = 1
 
 # Velocidad de la luz
 distances = np.array([135, 135, 135.8, 135.3]) / 100
@@ -58,7 +62,7 @@ light_speed_err = light_speed * np.sqrt(
     (total_err / distance) ** 2 + (mean_err / mean) ** 2
 )
 
-print(f"c = {light_speed:.3e} ± {light_speed_err:.3e} m/s")
+print(f"c = {light_speed:.2e} ± {light_speed_err:.2e} m/s")
 
 fig, ax = plt.subplots(figsize=(9, 6))
 ax.step(
@@ -80,7 +84,7 @@ ax.errorbar(
 ax.text(
     0.05,
     0.95,
-    rf"$\mu = \qty{{{mean_ns:.4f} \pm {mean_err_ns:.4f}}}{{\ns}}$",
+    rf"$\mu = \qty{{{mean_ns:.2f} \pm {mean_err_ns:.2f}}}{{\s}}$",
     transform=ax.transAxes,
     va="top",
 )
