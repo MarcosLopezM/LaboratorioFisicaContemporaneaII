@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import numpy as np
+from scipy.stats import mode
 import matplotlib.pyplot as plt
 
 plt.rcParams.update(
@@ -64,6 +65,24 @@ light_speed_err = light_speed * np.sqrt(
 
 print(f"c = {light_speed:.2e} ± {light_speed_err:.2e} m/s")
 
+##### Cálculo de la distancia con la moda de la distribución ####
+idx_max = np.argmax(counts)
+time_mode = time[idx_max]
+dt = np.mean(np.diff(time))
+time_mode_err = dt / 2
+time_mode_ns = time_mode / 1e-9
+time_mode_err_ns = time_mode_err / 1e-9
+
+# Velocidad de la luz
+ls_mode = distance / time_mode
+ls_mode_err = ls_mode * np.sqrt(
+    (total_err / distance) ** 2 + (time_mode_err / time_mode) ** 2
+)
+print("Valor de la rapidez de la luz usando la moda")
+print(f"c = {ls_mode:.2e} ± {ls_mode_err:.2e} m/s")
+print(time_mode, time_mode_ns)
+print(time_mode_err, time_mode_err_ns)
+
 fig, ax = plt.subplots(figsize=(9, 6))
 ax.step(
     time,
@@ -84,7 +103,11 @@ ax.errorbar(
 ax.text(
     0.05,
     0.95,
-    rf"$\mu = \qty{{{mean_ns:.2f} \pm {mean_err_ns:.2f}}}{{\s}}$",
+    (
+        rf"$\mu = \qty{{{mean_ns:.2f} \pm {mean_err_ns:.2f}}}{{\s}}$"
+        "\n"
+        rf"$\textrm{{moda}} = \qty{{{time_mode_ns:.2f} \pm {time_mode_err_ns:.2f}}}{{\s}}$"
+    ),
     transform=ax.transAxes,
     va="top",
 )
